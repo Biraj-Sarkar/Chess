@@ -67,6 +67,11 @@ The notebook outputs a trained model:
 
 ---
 
+## 🚀 Live Demo
+👉 https://aichess.streamlit.app/
+
+---
+
 ## ▶️ How to Run
 
 ### 1. Install dependencies
