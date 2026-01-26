@@ -1,55 +1,96 @@
-# ♟️ Chess ML Engine – CNN + Minimax
+# ♟️ Chess Engine with CNN Evaluation & Negamax Search
 
-A playable chess engine that uses a **Convolutional Neural Network (CNN)** to evaluate board positions and a **Minimax search algorithm** to choose moves.  
-The project demonstrates how a learned evaluation function can be integrated into a classical game-playing engine.
+A full-stack chess engine that combines a Convolutional Neural Network (CNN) for position evaluation with a classical Negamax search algorithm.
+The project focuses on integrating machine learning into a traditional game-search pipeline rather than competing with professional engines.
 
 ---
 
 ## 🚀 Features
 
 - Play a full game of chess against an AI
-- CNN-based position evaluation (White better / Equal / Black better)
-- Minimax search with configurable depth
+- CNN-based position evaluation
+- Negamax search with:
+  - Alpha–beta pruning
+  - Quiescence search
+  - Transposition table
+  - Iterative deepening
 - Legal move generation using `python-chess`
-- Interactive UI built with Streamlit
+- FastAPI backend with REST API
+- React-based frontend chessboard UI
+- Interactive UI built with Streamlit (v1.0)
 - Clean separation between ML, engine logic, and UI
 
 ---
 
 ## 🧠 Architecture Overview
-Chess/  
-├── engine/ # Chess engine (Minimax + move selection)  
-├── ml/ # ML inference + board encoding  
+Backend/  
+├── api/ # FastAPI server  
+├── engine/ # Chess engine (Negamax + quiescence search + move selection + Game flow logic)  
+├── ml/ # ML inference + board encoding  (Tensorflow)  
 ├── models/ # Trained CNN model (.keras)  
-├── ui/ # Streamlit UI  
+├── ui/ # Streamlit UI (v1.0)  
+├── utils/ # Normalize FEN  
 ├── chess.ipynb # Training & experimentation notebook  
 └── requirements.txt
 
 
 ### Core Components
 
-- **CNN Evaluator**
+**CNN Evaluator**
   - Input: 8×8×17 tensor representation of the board
-  - Output: Probabilities for {Black better, Equal, White better}
+  - Encodes:
+    - 12 piece planes (6 white + 6 black)
+    - 1 side-to-move plane
+    - 4 castling-rights planes
+  - Output: Scalar evaluation
+    - Positive → White is better
+    - Negative → Black is better
 
-- **Engine**
-  - Uses Minimax search
-  - CNN provides evaluation at leaf nodes
-  - Supports adjustable depth
+The CNN is only used at leaf nodes (and in quiescence), not during the full search.
 
-- **UI**
+**Engine**
+  - Negamax formulation (single-perspective minimax)
+  - Alpha–beta pruning
+  - Quiescence search for capture stability
+  - Transposition table with normalized FEN keys
+  - Iterative deepening with time control
+  
+This design mirrors how real chess engines are structured, though simplified.
+
+**Backend (FastAPI)**
+- Endpoint:
+  ```bash
+  POST /move
+  ```
+- Input:
+  ```bash
+  {
+    "fen": "...",
+    "move": "e2e4",
+    "max_time": 1.0
+  }
+  ```
+- Output:
+  ```bash
+  {
+    "fen": "...",
+    "ai_move": "c7c5"
+  }
+  ```
+- CNN model is lazy-loaded
+- Evaluation results are cached for performance
+
+**UI**
   - Streamlit-based interactive chess interface
   - Dropdown-based move selection (legal moves only)
   - Real-time board updates
 
----
-
-## 📊 Board Representation
-
-Each position is encoded as a tensor with:
-- 12 planes for piece types (6 white + 6 black)
-- 1 plane for side to move
-- 4 planes for castling rights
+**Frontend (React)**
+- Interactive chessboard
+- Legal-move enforcement
+- Promotion handling
+- AI responds automatically after user move
+- Communicates with backend via REST API
 
 ---
 
@@ -68,55 +109,65 @@ The notebook outputs a trained model:
 ---
 
 ## 🚀 Live Demo
-👉 https://aichess.streamlit.app/
+👉 https://aichess.streamlit.app/  
+👉 https://aichess.streamlit.app/  
 
 ---
 
 ## ▶️ How to Run
 
-### 1. Install dependencies
+### Backend
 ```bash
+cd backend
 pip install -r requirements.txt
+uvicorn main:app --reload
 ```
 
-### 2. Run the application
+### Run the streamlit application
 ```bash
+cd backend
 streamlit run ui/app.py
 ```
 
-### 3. Play
-* Select a legal move from the dropdown
-* Click Play Move
-* The AI responds automatically
+### Run the frontend application
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 ---
 
 ## ⚙️ Configuration
-* Minimax depth can be adjusted in app.py
-* Lower depth → faster, weaker play
-* Higher depth → slower, stronger play
+* AI thinking time is configurable per move
+* Longer time → deeper search → stronger play
+* Shorter time → faster but weaker play
 
 --- 
 
-## 📌 Limitations (v1)
-* UI uses Streamlit (no drag-and-drop board)
-* CNN predicts coarse evaluation categories, not centipawn values
-* No alpha–beta pruning (yet)
-* These are intentional design choices for clarity and learning.
+## 📌 Limitations (v2)
+* Written in Python, not C++
+* CNN evaluation is slower than NNUE-style models
+* No opening book or endgame tablebases
+* Not intended to compete with Stockfish or Chess.com engines
+
+This project prioritizes clarity, correctness, and learning over raw playing strength.
 
 ---
 
 ## 🔮 Future Improvements
-* Alpha–beta pruning for faster search
-* Regression-based evaluator (centipawn prediction)
-* Clickable/drag-and-drop UI
-* Full-stack deployment (React + FastAPI)
+* Opening book integration
+* Killer moves & history heuristics
+* NNUE-style evaluator
+* Endgame tablebases
+* C++ engine core
 * Self-play training
+* Stronger evaluation targets (centipawn regression)
 
 ---
 
 ## 👨‍💻 Author
 
-Built as a learning-focused ML + systems project to explore how neural networks can be combined with classical algorithms in game AI.
+Built as a learning-focused project to explore how machine learning models can be integrated into classical game-search algorithms, with an emphasis on clean architecture and correctness.
 
 ---
