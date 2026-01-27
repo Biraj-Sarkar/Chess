@@ -92,7 +92,7 @@ if st.session_state.awaiting_ai:
     board = st.session_state.board
 
     with st.spinner("AI is thinking..."):
-        ai_move = choose_move(board, depth=2)
+        ai_move = choose_move(board, 1.0)
 
     if ai_move is not None:
         board.push(ai_move)
