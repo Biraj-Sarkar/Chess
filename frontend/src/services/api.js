@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000";
+const API_URL = "https://chess-d5p9.onrender.com";
 
 export async function playMove(fen, move, max_time = 1.0) {
     const res = await fetch(`${API_URL}/move`, {
