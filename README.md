@@ -33,6 +33,9 @@ Backend/
 ├── chess.ipynb # Training & experimentation notebook  
 └── requirements.txt
 
+Frontend/
+├── React chess UI
+
 
 ### Core Components
 
@@ -109,8 +112,14 @@ The notebook outputs a trained model:
 ---
 
 ## 🚀 Live Demo
+Streamlit:  
 👉 https://aichess.streamlit.app/  
-👉 https://aichess.streamlit.app/  
+
+Frontend:  
+👉 https://chess-one-sable.vercel.app/
+
+Backend:  
+👉 https://chess-d5p9.onrender.com/ 
 
 ---
 
